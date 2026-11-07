@@ -20,6 +20,7 @@
     current: null,
     sizes: {},
     filter: 'all',
+    mode: (() => { try { return localStorage.getItem('mequeda:mode') || 'tu'; } catch (e) { return 'tu'; } })(),
   };
   const hrefs = {};
   const imgs = {}; // garmentId -> Image cargada (para "vestir" la prenda)
@@ -85,6 +86,9 @@
     const opts = { skin: p.skin, photo: p.photo };
     const r = MQ.renderAvatar(b, outfitFor(b), opts);
     $('avatar').innerHTML = r.svg;
+    document.querySelectorAll('#modeSeg [data-m]').forEach((x) => x.setAttribute('aria-checked', String(x.dataset.m === state.mode)));
+    $('modeFace').style.backgroundImage = p.photo ? 'url(' + p.photo.src + ')' : '';
+    aiRender(b);
     document.querySelectorAll('#tabs button').forEach((x) => x.setAttribute('aria-selected', String(x.dataset.f === state.filter)));
 
     const list = visible();
@@ -165,6 +169,8 @@
     $('facePreview').innerHTML = MQ.renderAvatar(b, {}, { skin: p.skin, photo: p.photo }).svg;
     const est = MQ.estimateBody({ gender: p.gender, height: p.height, weight: p.weight });
     for (const [id, k] of [['mChest', 'chest'], ['mWaist', 'waist'], ['mHip', 'hip']]) { $(id).placeholder = est[k]; $(id).value = p.overrides[k] || ''; }
+    $('aiKey').placeholder = MQ.ai.enabled() ? 'Clave guardada ••••' + MQ.ai.getKey().slice(-4) + ' (pega otra para cambiarla)' : 'Pega tu clave (empieza por AIza…)';
+    if (MQ.ai.enabled() && !$('aiState').textContent) $('aiState').textContent = 'Conectada · modelo ' + MQ.ai.model();
     $('measureSummary').textContent = 'pecho ' + b.chest + ' · cintura ' + b.waist + ' · cadera ' + b.hip + ' cm';
   }
   function seg(id, v) { document.querySelectorAll('#' + id + ' button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === v))); }
@@ -241,6 +247,79 @@
     toast('Listo: ' + best.name + (table ? ' (con la tabla de tallas de la tienda)' : ''));
   });
 
+  // ------------------------------------------------------------ IA: verte con la ropa puesta
+  let aiToken = 0, aiTimer = null, aiTick = null;
+  const inflight = new Map(); // misma combinación pedida dos veces = una sola llamada a Google
+  function aiStatus(html, kind) {
+    const st = $('aiStatus');
+    if (!html) { st.hidden = true; return; }
+    st.hidden = false;
+    st.className = 'ai-status glass' + (kind === 'err' ? ' err' : '');
+    st.innerHTML = (kind === 'busy' ? '<span class="spin"></span>' : '') + html;
+  }
+  function showAi(url) {
+    $('avatar').innerHTML = '<img class="ai-person" src="' + url + '" alt="Tú con la ropa puesta" />';
+  }
+  async function garmentJpeg(g) {
+    const im = imgOf(g) || (await MQ.loadImage(hrefOf(g)));
+    return MQ.toJpeg(im, 900, '#ffffff');
+  }
+  async function aiRender(b) {
+    const token = ++aiToken;
+    clearTimeout(aiTimer);
+    if (!MQ.ai || !MQ.ai.enabled()) { aiStatus(''); return; }
+    if ($('profileSheet').open) return;
+    const items = [];
+    for (const slot of ['top', 'bottom']) { const g = byId(state.outfit[slot]); if (g) items.push({ g, size: sizeFor(g, b).size }); }
+    if (!items.length) { aiStatus(''); return; }
+    const pid = state.mode === 'tu' ? state.profile.personId : 'modelo|' + [b.gender, b.height, b.weight].join('|');
+    if (!pid) { aiStatus('Sube tu foto de cuerpo completo (botón de la cámara) para verte con IA'); return; }
+    const key = 'try|' + pid + '|' + items.map((it) => it.g.id + ':' + it.size).join('|');
+    const cached = await MQ.getRender(key);
+    if (token !== aiToken) return;
+    if (cached) { showAi(cached); aiStatus(''); return; }
+    aiTimer = setTimeout(() => aiGenerate(token, key, pid, items, b), 450);
+  }
+  async function aiGenerate(token, key, pid, items, b) {
+    const main = byId(state.current) || items[0].g;
+    const t0 = Date.now();
+    const st = { phase: 'Vistiéndote con ' + esc(main.name) };
+    const paint = () => { if (token === aiToken) aiStatus(st.phase + ' <small>· ' + Math.round((Date.now() - t0) / 1000) + ' s</small>', 'busy'); };
+    clearInterval(aiTick);
+    paint();
+    aiTick = setInterval(paint, 1000);
+    $('avatar').classList.add('busy');
+    try {
+      if (!inflight.has(key)) inflight.set(key, aiJob(key, pid, items, b, st).finally(() => inflight.delete(key)));
+      const final = await inflight.get(key);
+      if (token === aiToken) { showAi(final); aiStatus(''); }
+    } catch (e) {
+      if (token === aiToken) aiStatus(esc(e.message), 'err');
+    } finally {
+      if (token === aiToken) { clearInterval(aiTick); $('avatar').classList.remove('busy'); }
+    }
+  }
+  async function aiJob(key, pid, items, b, st) {
+    let person = await MQ.getRender(pid);
+    if (!person && state.mode === 'modelo') {
+      const label = st.phase;
+      st.phase = 'Creando tu modelo';
+      if (!inflight.has(pid)) inflight.set(pid, MQ.ai.makeModel(b).then(async (m) => { await MQ.putRender(pid, m); return m; }).finally(() => inflight.delete(pid)));
+      person = await inflight.get(pid);
+      st.phase = label;
+    }
+    if (!person) throw new Error('No encuentro tu foto. Súbela de nuevo en "Pruébatelo tú".');
+    const payload = [];
+    for (const it of items) {
+      payload.push({ slot: it.g.category, image: await garmentJpeg(it.g), name: it.g.name, size: it.size, fit: MQ.ai.fitText(MQ.evaluate(it.g, it.size, b, state.profile.pref)) });
+    }
+    const out = await MQ.ai.tryOn({ person, items: payload });
+    let final = out;
+    try { const cut = await MQ.cutPerson(await MQ.loadImage(out)); if (cut) final = cut.src; } catch (e) { /* se muestra sin recortar */ }
+    await MQ.putRender(key, final);
+    return final;
+  }
+
   // ------------------------------------------------------------ tu cara
   async function onPhoto(e) {
     const file = e.target.files && e.target.files[0];
@@ -250,7 +329,16 @@
     const st = $('faceStatus');
     st.innerHTML = '<span class="spin" style="display:inline-block;vertical-align:-4px"></span> Recortando tu cara…';
     try {
-      const img = await MQ.loadImage(url);
+      let img;
+      try { img = await MQ.loadImage(url); } catch (err) {
+        throw new Error(/heic|heif/i.test(file.type + file.name) ? 'Esa foto está en formato HEIC (iPhone). Ábrela en Safari, o en el iPhone ve a Ajustes → Cámara → Formatos → "Más compatible", o envíatela por WhatsApp y usa esa.' : 'No pude leer esa foto. Prueba con otra (JPG o PNG).');
+      }
+      // Foto completa para la IA (guardada solo en este navegador)
+      await MQ.putRender('person-full', MQ.toJpeg(img, 1024));
+      const pid = 'person|' + Date.now();
+      await MQ.putRender(pid, MQ.toJpeg(img, 1024));
+      state.profile.personId = pid;
+      state.mode = 'tu';
       let face = null;
       try { face = await MQ.cutFace(img); } catch (err) { face = null; }
       if (face) {
@@ -268,7 +356,7 @@
       }
       commitProfile();
     } catch (err) {
-      st.textContent = 'No pude leer esa foto. Prueba con otra.';
+      st.textContent = err.message || 'No pude leer esa foto. Prueba con otra.';
     } finally { URL.revokeObjectURL(url); }
   }
 
@@ -290,7 +378,8 @@
     document.querySelectorAll('[data-close]').forEach((x) => x.addEventListener('click', () => x.closest('dialog').close()));
     document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
 
-    $('profileForm').addEventListener('submit', () => { p.done = true; commitProfile(); });
+    $('profileForm').addEventListener('submit', () => { p.done = true; setTimeout(commitProfile, 0); });
+    $('profileSheet').addEventListener('close', () => render());
     document.querySelectorAll('#genderSeg button').forEach((x) => x.addEventListener('click', () => { p.gender = x.dataset.v; commitProfile(); }));
     document.querySelectorAll('#prefSeg button').forEach((x) => x.addEventListener('click', () => { p.pref = x.dataset.v; state.sizes = {}; commitProfile(); }));
     $('height').addEventListener('input', (e) => { if (+e.target.value >= 130) { p.height = +e.target.value; commitProfile(); } });
@@ -301,9 +390,27 @@
     $('skinSwatches').addEventListener('click', (e) => { const c = e.target.closest('[data-c]'); if (c) { p.skin = c.dataset.c; commitProfile(); } });
     $('photoInput').addEventListener('change', onPhoto);
     $('photoInput').addEventListener('click', () => MQ.warmFace && MQ.warmFace());
-    $('removePhoto').addEventListener('click', () => { p.photo = null; $('skinAuto').textContent = ''; $('faceStatus').textContent = ''; commitProfile(); });
+    $('removePhoto').addEventListener('click', () => { p.photo = null; p.personId = null; $('skinAuto').textContent = ''; $('faceStatus').textContent = ''; commitProfile(); });
     for (const [id, k] of [['pZoom', 'zoom'], ['pX', 'x'], ['pY', 'y']]) $(id).addEventListener('input', (e) => { if (p.photo) { p.photo[k] = +e.target.value; commitProfile(); } });
 
+    $('modeSeg').addEventListener('click', (e) => {
+      const x = e.target.closest('[data-m]'); if (!x) return;
+      state.mode = x.dataset.m;
+      try { localStorage.setItem('mequeda:mode', state.mode); } catch (err) { /* sin guardado */ }
+      if (state.mode === 'tu' && !p.personId && !MQ.ai.enabled()) toast('Sube tu foto con el botón de la cámara.');
+      render();
+    });
+    $('aiSave').addEventListener('click', async () => {
+      const v = $('aiKey').value.trim();
+      if (v) MQ.ai.setKey(v);
+      $('aiState').innerHTML = '<span class="spin" style="display:inline-block;vertical-align:-4px"></span> Verificando con Google…';
+      try {
+        const r = await MQ.ai.check();
+        $('aiKey').value = '';
+        $('aiState').textContent = 'Conectada ✓ · modelo ' + r.model + '. Ya puedes verte con la ropa puesta.';
+        render();
+      } catch (err) { $('aiState').textContent = err.message; }
+    });
     $('tabs').addEventListener('click', (e) => { const x = e.target.closest('[data-f]'); if (x) { state.filter = x.dataset.f; state.current = null; render(); } });
     const pick = (e) => {
       const x = e.target.closest('[data-size]'); if (!x) return;

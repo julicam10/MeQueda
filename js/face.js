@@ -163,6 +163,53 @@
     };
   };
 
+  /**
+   * Recorta a la persona completa (para poner la foto generada por la IA dentro del showroom).
+   * Devuelve un PNG con transparencia recortado a la persona, o null.
+   */
+  MQ.cutPerson = async function (img) {
+    const max = 1024, k = Math.min(1, max / Math.max(img.width, img.height));
+    const W = Math.round(img.width * k), H = Math.round(img.height * k);
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, W, H);
+    const seg = await segmenter();
+    const mask = await maskOf(seg, c);
+    const m = document.createElement('canvas');
+    m.width = W; m.height = H;
+    const mctx = m.getContext('2d', { willReadFrequently: true });
+    mctx.drawImage(mask, 0, 0, W, H);
+    const md = mctx.getImageData(0, 0, W, H).data;
+    const id = ctx.getImageData(0, 0, W, H);
+    let x0 = W, x1 = -1, y0 = H, y1 = -1;
+    for (let p = 0; p < W * H; p++) {
+      const v = md[p * 4];
+      const a = v < 110 ? 0 : v > 210 ? 255 : Math.round(((v - 110) / 100) * 255);
+      id.data[p * 4 + 3] = a;
+      if (a > 128) { const x = p % W, y = (p / W) | 0; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    if (x1 < 0 || (y1 - y0) < H * 0.3) return null;
+    ctx.putImageData(id, 0, 0);
+    const pad = 4;
+    x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(W - 1, x1 + pad); y1 = Math.min(H - 1, y1 + pad);
+    const out = document.createElement('canvas');
+    out.width = x1 - x0 + 1; out.height = y1 - y0 + 1;
+    out.getContext('2d').drawImage(c, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+    return { src: out.toDataURL('image/png'), w: out.width, h: out.height, touchesBottom: y1 >= H - 6 };
+  };
+
+  /** Imagen → JPEG en dataURL (con fondo blanco si tiene transparencia), lado mayor ≤ max. */
+  MQ.toJpeg = function (img, max = 1024, bg = '#ffffff') {
+    const k = Math.min(1, max / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round((img.naturalWidth || img.width) * k); c.height = Math.round((img.naturalHeight || img.height) * k);
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.9);
+  };
+
   /** Precarga el modelo en segundo plano. */
   MQ.warmFace = () => { segmenter().catch(() => {}); };
 })();

@@ -45,6 +45,22 @@ svg { flex: none; }
 .pill svg, .round svg, .tools svg, .nav svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .round { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
 
+/* ---------- modelo / tú */
+.mode { display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 999px; }
+.mode button { border: 0; background: transparent; display: inline-flex; align-items: center; gap: 8px; padding: 8px 15px; border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13.5px; color: var(--ink-2); }
+.mode button[aria-checked="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 2px 8px rgba(70,52,30,.15); }
+.mode .cam { width: 38px; height: 38px; padding: 0; justify-content: center; }
+.mode .cam svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.mface { width: 24px; height: 24px; border-radius: 50%; background: #cdbca6 center/cover; flex: none; }
+.ai-status { position: absolute; z-index: 4; left: 50%; top: 2%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 10px 18px 10px 14px; border-radius: 999px; font-weight: 700; font-size: 13.5px; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; }
+.ai-status small { color: var(--ink-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.ai-status.err { color: var(--bad); white-space: normal; text-align: center; }
+.avatar .ai-person { height: 100%; max-height: calc(100vh - 210px); width: auto; max-width: 46vw; object-fit: contain; object-position: bottom; filter: drop-shadow(0 24px 24px rgba(70,52,30,.22)); }
+.avatar.busy .avatar-svg, .avatar.busy .ai-person { opacity: .55; transition: opacity .3s; }
+.ai-box { display: grid; gap: 8px; padding: 14px; border-radius: 18px; background: #fff; }
+.key-row { display: flex; gap: 8px; }
+.key-row input { flex: 1; min-width: 0; font: 500 14px var(--font); padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(28,26,23,.12); background: var(--paper); color: var(--ink); }
+
 /* ---------- herramientas */
 .tools { position: absolute; z-index: 5; left: max(22px, env(safe-area-inset-left, 0px)); top: 50%; transform: translateY(-50%); display: grid; gap: 6px; padding: 8px; border-radius: 999px; }
 .tools button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--ink-2); transition: background .2s; }
@@ -171,7 +187,10 @@ input[type="range"] { width: 100%; accent-color: var(--ink); }
   .tabs { grid-column: 1 / -1; grid-row: 2; justify-self: center; max-width: 100%; overflow-x: auto; }
   .tabs button { padding: 8px 13px; font-size: 13px; }
   .pill span { display: none; }
-  #tryYou { padding: 12px; }
+  .mode button { padding: 7px 10px; font-size: 12.5px; }
+  .mface { display: none; }
+  .avatar .ai-person { max-height: 62vh; max-width: 86vw; }
+  .ai-status { top: 0; font-size: 12.5px; }
   .tools { top: auto; bottom: auto; left: auto; right: max(16px, env(safe-area-inset-right, 0px)); top: 168px; transform: none; grid-auto-flow: row; }
   .tools button { width: 40px; height: 40px; }
   .floor { grid-template-columns: 1fr; grid-template-rows: auto auto; min-height: 0; }

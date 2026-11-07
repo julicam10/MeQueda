@@ -80,10 +80,13 @@
         <button type="button" role="tab" data-f="all">Todo</button>
       </nav>
       <div class="top-actions">
-        <button type="button" class="pill dark" id="tryYou">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
-          <span>Pruébatelo tú</span>
-        </button>
+        <div class="mode glass" id="modeSeg" role="radiogroup" aria-label="Quién se prueba la ropa">
+          <button type="button" data-m="modelo" role="radio">Modelo</button>
+          <button type="button" data-m="tu" role="radio"><span class="mface" id="modeFace"></span>Tú</button>
+          <button type="button" class="cam" id="tryYou" aria-label="Pruébatelo tú: tu foto y ajustes">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          </button>
+        </div>
         <button type="button" class="round glass" id="addTop" aria-label="Agregar prenda">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         </button>
@@ -112,6 +115,7 @@
       <button type="button" class="nav prev glass" id="prevBtn" aria-label="Prenda anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <button type="button" class="nav next glass" id="nextBtn" aria-label="Prenda siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
       <button type="button" class="verdict glass" id="verdictChip"></button>
+      <div class="ai-status glass" id="aiStatus" role="status" aria-live="polite" hidden></div>
     </main>
 
     <footer class="dock glass" id="dock" aria-label="Prenda actual">
@@ -148,7 +152,7 @@
     <form method="dialog" class="sheet-body" id="profileForm">
       <header class="sheet-head">
         <h2 id="profileTitle">Pruébatelo tú</h2>
-        <p>Sube una selfie de frente: recortamos tu cara automáticamente y la ponemos en el avatar. Todo pasa en tu navegador, sin costo y sin subir nada.</p>
+        <p>Sube una foto tuya <b>de cuerpo completo, de frente</b> (de la cabeza a los zapatos, con buena luz). Con ella la IA te viste con cada prenda.</p>
       </header>
       <div class="face-row">
         <div class="face-preview" id="facePreview"></div>
@@ -156,7 +160,7 @@
           <label class="pill dark">
             <input type="file" id="photoInput" accept="image/*" hidden />
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
-            <span id="photoLabel">Subir selfie</span>
+            <span id="photoLabel">Subir mi foto</span>
           </label>
           <p class="status" id="faceStatus"></p>
           <button type="button" class="link" id="removePhoto" hidden>Quitar foto</button>
@@ -167,6 +171,15 @@
           </div>
         </div>
       </div>
+      <section class="ai-box">
+        <span class="lbl">Verte con IA (Gemini de Google)</span>
+        <p class="hint">Crea tu clave en <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> (entra con tu Gmail → “Create API key”) y pégala aquí. Se guarda solo en este navegador. Cada foto generada puede costar unos centavos de dólar según tu plan de Google; las que ya generaste se guardan y no se vuelven a cobrar.</p>
+        <div class="key-row">
+          <input id="aiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Pega tu clave (empieza por AIza…)" />
+          <button type="button" class="pill dark" id="aiSave">Conectar</button>
+        </div>
+        <p class="status" id="aiState"></p>
+      </section>
       <fieldset class="seg" id="genderSeg"><legend>Ropa de</legend>
         <button type="button" data-v="men">Hombre</button><button type="button" data-v="women">Mujer</button>
       </fieldset>
@@ -219,6 +232,7 @@
   <script src="js/drape.js"></script>
   <script src="js/face.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/ai.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -6,6 +6,20 @@ Mira cómo te queda la ropa de cualquier tienda online —con su diseño real—
 
 👉 **Pruébalo:** https://julicam10.github.io/MeQueda/
 
+## Verte con IA (como en una foto real)
+
+Con el botón de la cámara (**Pruébatelo tú**):
+1. Sube una foto tuya **de cuerpo completo, de frente**.
+2. Pega tu clave de **Google AI Studio** (https://aistudio.google.com/apikey → *Create API key*). Se guarda solo en tu navegador.
+3. Elige una prenda y una talla: aparece **“Vistiéndote con… · N s”** y en unos segundos te ves con la ropa puesta dentro del showroom.
+
+- **Modelo | Tú**: sin tu foto, la IA crea un modelo genérico con tu altura y contextura.
+- La app envía a Gemini tu foto + la foto real de la(s) prenda(s) + cómo te queda la talla (holgada, ceñida, larga…).
+- Cada combinación ya generada se guarda en tu navegador y no se vuelve a pagar.
+- Costo: lo que cobre Google por imagen según tu plan (unos centavos de dólar; a veces hay cuota gratis).
+
+Sin clave, MeQueda funciona igual con el avatar dibujado (gratis).
+
 ## Cómo funciona
 
 1. **Tu avatar**: altura, peso y una selfie. **Recortamos tu cara (con pelo) automáticamente** y la ponemos sobre un cuerpo genérico con volumen y luz realista, con el tono de piel de tu foto. El recorte usa MediaPipe Selfie Segmentation, que corre 100% en tu navegador: gratis y sin subir nada.
@@ -37,6 +51,7 @@ Todo corre en tu navegador. Tu foto, tus medidas y tus prendas se guardan solo e
 | `js/sizing.js` | Medidas del cuerpo, medidas de la prenda por talla, lectura de tablas de tallas y recomendación. |
 | `js/avatar.js` | Avatar paramétrico en SVG (unidades en cm): cuerpo con volumen, mangas que giran para seguir los brazos y montaje de la foto real de la prenda. |
 | `js/drape.js` | “Viste” la foto de la prenda sobre el cuerpo: ciñe el torso, convierte las mangas en tubos sobre los brazos y separa las piernas. |
+| `js/ai.js` | Prueba virtual con Gemini (tu clave, llamada directa desde el navegador). |
 | `js/face.js` | Recorte automático de tu cara desde la selfie (en el navegador). |
 | `vendor/selfie_segmentation/` | Modelo de MediaPipe (Apache-2.0) para recortar la cara. |
 | `js/app.js`, `js/store.js` | Interfaz y guardado local. |
