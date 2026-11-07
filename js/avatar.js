@@ -320,8 +320,28 @@
     const G = geometry(body, F ? F.armDeg : 11);
     const skin = opts.skin || '#d9a47c';
     const B = drawBody(G, id, skin);
-    const top = F ? placeTop(G, F, id + 't', outfit.top.href) : null;
-    const bot = outfit.bottom ? placeBottom(G, body, outfit.bottom.garment, outfit.bottom.size, id + 'b', outfit.bottom.href) : null;
+    const bkey = [body.gender, body.height, body.chest, body.waist, body.hip, body.inseam, body.shoulder].join('|');
+    let top = null, bot = null;
+    if (F && outfit.top.img && MQ.drapeTop) {
+      // La prenda "puesta": se ciñe al cuerpo y las mangas siguen los brazos
+      const D = MQ.drapeTop(G, F, outfit.top.img, outfit.top.garment.id + '|' + outfit.top.size + '|' + bkey);
+      const im = (u, x, y, w, h) => '<image href="' + u + '" x="' + f(x) + '" y="' + f(y) + '" width="' + f(w) + '" height="' + f(h) + '" preserveAspectRatio="none"/>';
+      top = {
+        defs: '',
+        sleeves: '<g filter="url(#' + id + 'tsoft)">' + D.sleeves.map((sl) => '<g transform="translate(' + f(sl.ox) + ' ' + f(sl.oy) + ') rotate(' + f(sl.rot) + ')">' + im(sl.url, -sl.w / 2, 0, sl.w, sl.h) + '</g>').join('') + '</g>',
+        body: '<g filter="url(#' + id + 'tsoft)">' + im(D.body.url, D.body.x, D.body.y, D.body.w, D.body.h) + '</g>',
+      };
+    } else if (F) top = placeTop(G, F, id + 't', outfit.top.href);
+    if (outfit.bottom && outfit.bottom.img && MQ.drapeBottom) {
+      const g = outfit.bottom.garment, a = g.analysis, S = MQ.garmentSpecs(g, body.gender).specs[outfit.bottom.size];
+      const sx = S.waist / 2 / a.waistFlat, sy = S.inseam / a.inseamPx, ty = G.crotchY + 2 - a.crotchY * sy;
+      const D = MQ.drapeBottom(G, { a, sx, sy, ty }, outfit.bottom.img, g.id + '|' + outfit.bottom.size + '|' + bkey);
+      bot = {
+        defs: '',
+        body: '<g filter="url(#' + id + 'bsoft)"><image href="' + D.url + '" x="' + f(D.x) + '" y="' + f(D.y) + '" width="' + f(D.w) + '" height="' + f(D.h) + '" preserveAspectRatio="none"/></g>',
+        over: a.y1 * sy + ty - (G.floorY - 0.6),
+      };
+    } else if (outfit.bottom) bot = placeBottom(G, body, outfit.bottom.garment, outfit.bottom.size, id + 'b', outfit.bottom.href);
     const defs = '<defs>' +
       '<linearGradient id="' + id + 'skinH" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="' + shade(skin, -0.2) + '"/><stop offset="0.35" stop-color="' + shade(skin, 0.06) + '"/><stop offset="0.65" stop-color="' + skin + '"/><stop offset="1" stop-color="' + shade(skin, -0.24) + '"/></linearGradient>' +
       '<linearGradient id="' + id + 'rim" x1="0" x2="1"><stop offset="0" stop-color="' + shade(skin, -0.35) + '"/><stop offset="1" stop-color="' + shade(skin, -0.35) + '"/></linearGradient>' +

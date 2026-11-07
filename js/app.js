@@ -22,6 +22,18 @@
     filter: 'all',
   };
   const hrefs = {};
+  const imgs = {}; // garmentId -> Image cargada (para "vestir" la prenda)
+  function imgOf(g) {
+    const im = imgs[g.id];
+    if (im && im.complete && im.naturalWidth) return im;
+    if (!im) {
+      const n = new Image();
+      n.onload = () => render();
+      n.src = hrefOf(g);
+      imgs[g.id] = n;
+    }
+    return null;
+  }
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const body = () => MQ.estimateBody(state.profile);
   const byId = (id) => state.garments.find((g) => g.id === id);
@@ -55,7 +67,7 @@
     for (const slot of ['top', 'bottom']) {
       const g = byId(state.outfit[slot]);
       if (!g) continue;
-      o[slot] = { garment: g, size: override && override.id === g.id ? override.size : sizeFor(g, b).size, href: hrefOf(g) };
+      o[slot] = { garment: g, size: override && override.id === g.id ? override.size : sizeFor(g, b).size, href: hrefOf(g), img: imgOf(g) };
     }
     return o;
   }
