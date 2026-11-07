@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MeQueda</title>
+  <meta name="description" content="Mira cómo te queda cada prenda de una tienda online, en cada talla, con un avatar de tus medidas y tu cara." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👕</text></svg>" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">👕</span>
+      <div>
+        <h1>MeQueda</h1>
+        <p class="tagline">¿Te queda? Pruébatelo antes de comprar</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <label class="store-pill"><span>Tienda</span>
+        <select id="storeSelect" aria-label="Tienda"></select>
+      </label>
+      <button class="btn ghost only-mobile" id="toggleProfile" type="button">Mi perfil</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- PERFIL -->
+    <aside class="panel profile" id="profilePanel" aria-label="Tu perfil">
+      <h2>1 · Tu perfil</h2>
+
+      <div class="field">
+        <span class="label">Sección</span>
+        <div class="seg" role="radiogroup" id="genderSeg">
+          <button type="button" data-v="men" role="radio">Hombre</button>
+          <button type="button" data-v="women" role="radio">Mujer</button>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <label class="field">
+          <span class="label">Altura (cm)</span>
+          <input type="number" id="height" min="130" max="215" step="1" inputmode="numeric" />
+        </label>
+        <label class="field">
+          <span class="label">Peso (kg)</span>
+          <input type="number" id="weight" min="35" max="200" step="0.5" inputmode="decimal" />
+        </label>
+      </div>
+      <p class="hint" id="usUnits"></p>
+
+      <div class="field">
+        <span class="label">Cara (foto frontal)</span>
+        <div class="photo-row">
+          <div class="photo-preview" id="photoPreview" aria-hidden="true"></div>
+          <div class="photo-actions">
+            <label class="btn">
+              <input type="file" id="photoInput" accept="image/*" capture="user" hidden />
+              Subir foto
+            </label>
+            <button type="button" class="btn ghost small" id="removePhoto" hidden>Quitar</button>
+          </div>
+        </div>
+        <div id="photoAdjust" class="photo-adjust" hidden>
+          <label>Zoom <input type="range" id="pZoom" min="0.6" max="3" step="0.02" /></label>
+          <label>↔ <input type="range" id="pX" min="-1" max="1" step="0.01" /></label>
+          <label>↕ <input type="range" id="pY" min="-1" max="1" step="0.01" /></label>
+          <p class="hint">Centra tu cara dentro del óvalo del avatar.</p>
+        </div>
+        <p class="hint">🔒 La foto se queda en tu navegador: no se sube a ningún servidor.</p>
+      </div>
+
+      <div class="field">
+        <span class="label">Tono de piel</span>
+        <div class="swatches" id="skinSwatches"></div>
+      </div>
+
+      <div class="field">
+        <span class="label">¿Cómo te gusta la ropa?</span>
+        <div class="seg" role="radiogroup" id="prefSeg">
+          <button type="button" data-v="fitted" role="radio">Ceñida</button>
+          <button type="button" data-v="normal" role="radio">Normal</button>
+          <button type="button" data-v="loose" role="radio">Holgada</button>
+        </div>
+      </div>
+
+      <details class="measures" id="measuresBox">
+        <summary>Medidas estimadas <span class="hint">(edítalas si las conoces)</span></summary>
+        <div class="grid3">
+          <label class="field"><span class="label">Pecho</span><input type="number" id="mChest" step="0.5" /></label>
+          <label class="field"><span class="label">Cintura</span><input type="number" id="mWaist" step="0.5" /></label>
+          <label class="field"><span class="label">Cadera</span><input type="number" id="mHip" step="0.5" /></label>
+        </div>
+        <label class="field"><span class="label">Entrepierna (cm)</span><input type="number" id="mInseam" step="0.5" /></label>
+        <p class="hint">Contorno en cm, medido con cinta sobre el cuerpo. Vacío = estimado por altura y peso.</p>
+        <button type="button" class="btn ghost small" id="resetMeasures">Volver a estimar</button>
+      </details>
+
+      <div class="field">
+        <span class="label">Tasa USD → COP</span>
+        <input type="number" id="rate" min="1000" max="10000" step="10" />
+        <p class="hint">Solo para la conversión de precio. No incluye envío del casillero ni impuestos.</p>
+      </div>
+    </aside>
+
+    <!-- PROBADOR -->
+    <section class="panel stage" aria-label="Probador">
+      <div class="stage-head">
+        <h2>2 · Pruébate la ropa</h2>
+        <div class="tabs" role="tablist" id="filterTabs">
+          <button type="button" data-v="all" role="tab">Todo</button>
+          <button type="button" data-v="top" role="tab">Arriba</button>
+          <button type="button" data-v="bottom" role="tab">Abajo</button>
+        </div>
+        <button type="button" class="btn small" id="addProductBtn">+ Agregar prenda</button>
+      </div>
+
+      <div class="stage-body">
+        <div class="viewer">
+          <button type="button" class="nav prev" id="prevBtn" aria-label="Prenda anterior">‹</button>
+          <div class="avatar-wrap" id="avatarWrap"></div>
+          <button type="button" class="nav next" id="nextBtn" aria-label="Prenda siguiente">›</button>
+          <div class="counter" id="counter"></div>
+        </div>
+
+        <div class="info" id="info">
+          <div class="product-head">
+            <p class="eyebrow" id="pKind"></p>
+            <h3 id="pName"></h3>
+            <p class="price" id="pPrice"></p>
+            <a id="pLink" class="link" target="_blank" rel="noopener">Ver en la tienda ↗</a>
+          </div>
+
+          <div class="field">
+            <span class="label">Color: <b id="pColorName"></b></span>
+            <div class="swatches" id="pColors"></div>
+          </div>
+
+          <div class="field">
+            <span class="label">Talla</span>
+            <div class="sizes" id="pSizes"></div>
+          </div>
+
+          <div class="reco" id="reco"></div>
+          <ul class="fit-list" id="fitList"></ul>
+          <p class="combo" id="combo"></p>
+        </div>
+      </div>
+
+      <div class="strip-head">
+        <h3>Todas las tallas</h3>
+        <p class="hint">Toca una talla para verla en grande</p>
+      </div>
+      <div class="size-strip" id="sizeStrip"></div>
+
+      <div class="strip-head">
+        <h3>Catálogo</h3>
+        <p class="hint" id="catalogNote"></p>
+      </div>
+      <div class="carousel" id="carousel" role="listbox" aria-label="Prendas"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Prototipo. Las medidas del catálogo son aproximadas: revisa siempre la guía de tallas del producto.
+      Para mayor precisión usa <b>+ Agregar prenda</b> y copia la tabla de medidas de la web. No afiliado a ninguna tienda.</p>
+  </footer>
+
+  <!-- MODAL: agregar prenda de cualquier tienda -->
+  <dialog id="addDialog">
+    <form method="dialog" id="addForm" class="add-form">
+      <h2>Agregar prenda de cualquier tienda</h2>
+      <p class="hint">Copia la tabla de medidas de la <b>prenda</b> (no del cuerpo) que aparece en la guía de tallas.</p>
+      <div class="grid2">
+        <label class="field"><span class="label">Nombre</span><input name="name" required placeholder="Camiseta básica" /></label>
+        <label class="field"><span class="label">Tienda</span><input name="store" placeholder="Zara, H&M, Gap…" /></label>
+      </div>
+      <label class="field"><span class="label">Link del producto</span><input name="url" type="url" placeholder="https://…" /></label>
+      <div class="grid3">
+        <label class="field"><span class="label">Tipo</span><select name="kind" id="addKind"></select></label>
+        <label class="field"><span class="label">Ajuste</span><select name="fit" id="addFit"></select></label>
+        <label class="field"><span class="label">Precio USD</span><input name="price" type="number" step="0.01" min="0" /></label>
+      </div>
+      <div class="grid2">
+        <label class="field"><span class="label">Color</span><input name="color" type="color" value="#3d5a80" /></label>
+        <label class="field"><span class="label">¿Elástico en cintura?</span>
+          <select name="elastic"><option value="0">No</option><option value="6">Sí</option></select></label>
+      </div>
+      <label class="field">
+        <span class="label">Tabla de medidas (cm) — columnas: <code id="tableCols"></code></span>
+        <textarea name="table" id="addTable" rows="6" required></textarea>
+      </label>
+      <p class="hint">Una talla por línea, separada por comas o tabulaciones. Si la tabla está en pulgadas, escribe "in" en la primera línea.</p>
+      <p class="error" id="addError" hidden></p>
+      <div class="actions">
+        <button type="button" class="btn ghost" id="addCancel">Cancelar</button>
+        <button type="submit" class="btn primary" id="addSubmit">Agregar y probar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/catalog.js"></script>
+  <script src="js/fit.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
