@@ -123,9 +123,9 @@ def longsleeve(name, fill, hood=False, dy=190):
     compose(fill, m, name, extra)
 
 
-def jeans(name, color, dy=110):
+def jeans(name, color, dy=80):
     # cintura 41 cm plano ≈ 300 px · tiro 27 cm · entrepierna 80 cm
-    p = [(300, 120), (600, 120), (640, 300), (632, 905), (470, 905), (452, 330), (448, 330), (430, 905), (268, 905), (260, 300)]
+    p = [(300, 120), (600, 120), (640, 300), (634, 985), (470, 985), (452, 330), (448, 330), (430, 985), (266, 985), (260, 300)]
     m = poly_mask(off(p, dy))
     fill = noise_layer(color, 14)
 

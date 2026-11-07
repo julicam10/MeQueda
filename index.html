@@ -5,119 +5,179 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>MeQueda</title>
   <meta name="description" content="¿Te queda? Pruébate la ropa de cualquier tienda online en tu avatar, talla por talla." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23111214'/><path d='M20 18l8-4h8l8 4 8 10-7 5-3-3v20H22V30l-3 3-7-5z' fill='%23c8f169'/></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231c1a17'/><path d='M20 18l8-4h8l8 4 8 10-7 5-3-3v20H22V30l-3 3-7-5z' fill='%23efe4d4'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/app.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="bar">
-      <a class="brand" href="./" aria-label="MeQueda inicio">
-        <span class="mark" aria-hidden="true"></span>
-        <span class="word">Me<b>Queda</b></span>
+  <div class="showroom" id="showroom">
+    <!-- La sala: muro, tragaluz, piso, banca y planta -->
+    <svg class="room" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="wall" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e7dccd"/><stop offset="1" stop-color="#dccdb9"/></linearGradient>
+        <linearGradient id="wallSide" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".16"/><stop offset=".22" stop-color="#000" stop-opacity="0"/><stop offset=".78" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>
+        <linearGradient id="ceil" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#cfc0ab"/><stop offset="1" stop-color="#e4d8c8"/></linearGradient>
+        <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8fb3d8"/><stop offset=".6" stop-color="#c3d7ea"/><stop offset="1" stop-color="#edf2f6"/></linearGradient>
+        <linearGradient id="beam" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="floor" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d6c4ad"/><stop offset="1" stop-color="#c7b197"/></linearGradient>
+        <radialGradient id="pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <linearGradient id="bench" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e2d4c0"/><stop offset="1" stop-color="#c9b69d"/></linearGradient>
+        <linearGradient id="pot" x1="0" x2="1"><stop offset="0" stop-color="#b9a58b"/><stop offset=".5" stop-color="#d8c7af"/><stop offset="1" stop-color="#a89377"/></linearGradient>
+        <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+        <filter id="soft2"><feGaussianBlur stdDeviation="4"/></filter>
+      </defs>
+      <rect width="1600" height="1000" fill="url(#wall)"/>
+      <!-- techo con tragaluz en perspectiva -->
+      <path d="M0 0H1600V150L1340 250H260L0 150Z" fill="url(#ceil)"/>
+      <path d="M420 0H1180L1090 200H510Z" fill="#f3ede4"/>
+      <path d="M450 0H1150L1068 180H532Z" fill="url(#sky)"/>
+      <g stroke="#e9e1d5" stroke-width="10" fill="none">
+        <path d="M800 0V180"/><path d="M625 0L660 180"/><path d="M975 0L940 180"/><path d="M500 60H1100"/><path d="M520 120H1080"/>
+      </g>
+      <path d="M450 0H1150L1068 180H532Z" fill="none" stroke="#d6cab9" stroke-width="12"/>
+      <path d="M510 200H1090L1100 214H500Z" fill="#cbbca7"/>
+      <!-- haz de luz -->
+      <path d="M532 182H1068L1250 860H350Z" fill="url(#beam)" opacity=".55" filter="url(#soft)"/>
+      <rect width="1600" height="1000" fill="url(#wallSide)"/>
+      <!-- piso -->
+      <rect y="800" width="1600" height="200" fill="url(#floor)"/>
+      <rect y="796" width="1600" height="8" fill="#c6b29a" opacity=".7"/>
+      <ellipse cx="800" cy="880" rx="420" ry="70" fill="url(#pool)"/>
+      <!-- banca -->
+      <ellipse cx="190" cy="845" rx="190" ry="18" fill="#000" opacity=".12" filter="url(#soft2)"/>
+      <rect x="20" y="740" width="340" height="40" rx="6" fill="url(#bench)"/>
+      <rect x="40" y="780" width="70" height="62" fill="#c8b59c"/><rect x="270" y="780" width="70" height="62" fill="#c8b59c"/>
+      <!-- planta -->
+      <ellipse cx="1470" cy="852" rx="110" ry="16" fill="#000" opacity=".14" filter="url(#soft2)"/>
+      <path d="M1405 740H1535L1520 850H1420Z" fill="url(#pot)"/>
+      <path d="M1470 740C1468 650 1480 560 1462 470" stroke="#7b6a55" stroke-width="7" fill="none"/>
+      <path d="M1468 600C1430 560 1400 520 1380 470" stroke="#7b6a55" stroke-width="4" fill="none"/>
+      <path d="M1470 560C1510 520 1540 480 1560 430" stroke="#7b6a55" stroke-width="4" fill="none"/>
+      <g fill="#7e8a5c" opacity=".92">
+        <ellipse cx="1380" cy="460" rx="34" ry="12" transform="rotate(-30 1380 460)"/><ellipse cx="1400" cy="500" rx="30" ry="10" transform="rotate(20 1400 500)"/>
+        <ellipse cx="1365" cy="510" rx="28" ry="10" transform="rotate(-50 1365 510)"/><ellipse cx="1460" cy="460" rx="32" ry="11" transform="rotate(70 1460 460)"/>
+        <ellipse cx="1490" cy="440" rx="30" ry="10" transform="rotate(-20 1490 440)"/><ellipse cx="1555" cy="425" rx="34" ry="12" transform="rotate(35 1555 425)"/>
+        <ellipse cx="1535" cy="470" rx="30" ry="10" transform="rotate(-40 1535 470)"/><ellipse cx="1575" cy="470" rx="26" ry="9" transform="rotate(60 1575 470)"/>
+        <ellipse cx="1430" cy="420" rx="30" ry="10" transform="rotate(10 1430 420)"/><ellipse cx="1505" cy="400" rx="28" ry="10" transform="rotate(-60 1505 400)"/>
+      </g>
+      <g fill="#97a272" opacity=".85">
+        <ellipse cx="1415" cy="470" rx="26" ry="9" transform="rotate(40 1415 470)"/><ellipse cx="1520" cy="445" rx="26" ry="9" transform="rotate(10 1520 445)"/>
+        <ellipse cx="1470" cy="415" rx="24" ry="8" transform="rotate(-30 1470 415)"/><ellipse cx="1390" cy="540" rx="24" ry="8" transform="rotate(10 1390 540)"/>
+      </g>
+    </svg>
+
+    <header class="top">
+      <a class="brand" href="./" aria-label="MeQueda, inicio">
+        <b>MEQUEDA</b>
+        <small id="brandSub">PROBADOR VIRTUAL</small>
       </a>
-      <button class="profile-chip" id="profileChip" type="button" aria-label="Editar mi perfil">
-        <span class="chip-face" id="chipFace"></span>
-        <span class="chip-text"><b id="chipName">Mi perfil</b><small id="chipStats"></small></span>
-      </button>
+      <nav class="tabs glass" id="tabs" role="tablist" aria-label="Categorías">
+        <button type="button" role="tab" data-f="top">Superior</button>
+        <button type="button" role="tab" data-f="bottom">Inferior</button>
+        <button type="button" role="tab" data-f="jacket">Chaquetas</button>
+        <button type="button" role="tab" data-f="all">Todo</button>
+      </nav>
+      <div class="top-actions">
+        <button type="button" class="pill dark" id="tryYou">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          <span>Pruébatelo tú</span>
+        </button>
+        <button type="button" class="round glass" id="addTop" aria-label="Agregar prenda">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
     </header>
 
-    <main class="studio">
-      <!-- Escenario -->
-      <section class="stage" aria-label="Probador">
-        <div class="stage-top">
-          <div class="now" id="nowPlaying"></div>
-          <div class="slots" id="slots" role="tablist" aria-label="Prenda que estás ajustando"></div>
-        </div>
-        <button class="nav prev" id="prevBtn" type="button" aria-label="Prenda anterior">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-        </button>
-        <div class="avatar" id="avatar"></div>
-        <button class="nav next" id="nextBtn" type="button" aria-label="Prenda siguiente">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-        </button>
-        <div class="size-dock" id="sizeDock" aria-label="Tallas"></div>
-      </section>
+    <aside class="tools glass" aria-label="Herramientas">
+      <button type="button" id="toolAvatar" aria-label="Mi avatar" title="Mi avatar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4l-4 3 2 4 2-1v10h8V10l2 1 2-4-4-3c-1 1.5-2.3 2-4 2s-3-.5-4-2z"/></svg>
+      </button>
+      <button type="button" id="toolFit" aria-label="Cómo me queda" title="Cómo me queda">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16L16 4l4 4L8 20z"/><path d="M8 12l2 2M11 9l2 2M14 6l2 2"/></svg>
+      </button>
+      <button type="button" id="toolSizes" aria-label="Comparar tallas" title="Comparar tallas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="7" height="14" rx="2"/><rect x="14" y="5" width="7" height="14" rx="2"/></svg>
+      </button>
+      <button type="button" id="toolAdd" aria-label="Agregar prenda" title="Agregar prenda">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 15v5h16v-5"/></svg>
+      </button>
+    </aside>
 
-      <!-- Panel de ajuste -->
-      <aside class="panel" aria-label="Cómo te queda">
-        <div class="verdict" id="verdict"></div>
-        <ul class="fit" id="fitList"></ul>
-        <p class="source" id="source"></p>
-        <div class="compare">
-          <div class="h">
-            <h2>Todas las tallas</h2>
-            <span>Toca para verla en grande</span>
-          </div>
-          <div class="minis" id="minis"></div>
-        </div>
-      </aside>
+    <main class="floor" aria-label="Probador">
+      <div class="cards left" id="leftCards"></div>
+      <div class="avatar" id="avatar"></div>
+      <div class="cards right" id="rightCards"></div>
+      <button type="button" class="nav prev glass" id="prevBtn" aria-label="Prenda anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button type="button" class="nav next glass" id="nextBtn" aria-label="Prenda siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button type="button" class="verdict glass" id="verdictChip"></button>
     </main>
 
-    <!-- Armario -->
-    <section class="closet" aria-label="Tu armario">
-      <div class="closet-head">
-        <h2>Tu armario</h2>
-        <div class="filters" id="filters" role="tablist">
-          <button type="button" data-f="all">Todo</button>
-          <button type="button" data-f="top">Arriba</button>
-          <button type="button" data-f="bottom">Abajo</button>
-        </div>
+    <footer class="dock glass" id="dock" aria-label="Prenda actual">
+      <div class="dock-item">
+        <span class="thumb" id="dockThumb"></span>
+        <span class="dock-text"><b id="dockName">Agrega una prenda</b><small id="dockSub">Pega o arrastra la foto de una prenda</small></span>
       </div>
-      <div class="rail" id="rail"></div>
-    </section>
+      <div class="sizes" id="sizes" aria-label="Tallas"></div>
+      <a class="pill dark" id="dockAction" href="#" target="_blank" rel="noopener">Ver en la tienda</a>
+    </footer>
   </div>
 
-  <!-- Perfil -->
+  <!-- Cómo te queda -->
+  <dialog class="sheet" id="fitSheet" aria-labelledby="fitTitle">
+    <div class="sheet-body">
+      <header class="sheet-head"><h2 id="fitTitle">Cómo te queda</h2><p id="fitSub"></p></header>
+      <ul class="fit" id="fitList"></ul>
+      <p class="source" id="source"></p>
+      <div class="row-end"><button type="button" class="pill light" data-close>Cerrar</button></div>
+    </div>
+  </dialog>
+
+  <!-- Comparar tallas -->
+  <dialog class="sheet wide" id="sizesSheet" aria-labelledby="sizesTitle">
+    <div class="sheet-body">
+      <header class="sheet-head"><h2 id="sizesTitle">Todas las tallas</h2><p>Toca una para verla en grande.</p></header>
+      <div class="minis" id="minis"></div>
+      <div class="row-end"><button type="button" class="pill light" data-close>Cerrar</button></div>
+    </div>
+  </dialog>
+
+  <!-- Perfil / Pruébatelo tú -->
   <dialog class="sheet" id="profileSheet" aria-labelledby="profileTitle">
     <form method="dialog" class="sheet-body" id="profileForm">
       <header class="sheet-head">
-        <h2 id="profileTitle">Tu avatar</h2>
-        <p>Con tu altura, peso y una foto de tu cara armamos un avatar a tu medida. Todo se queda en tu navegador.</p>
+        <h2 id="profileTitle">Pruébatelo tú</h2>
+        <p>Sube una selfie de frente: recortamos tu cara automáticamente y la ponemos en el avatar. Todo pasa en tu navegador, sin costo y sin subir nada.</p>
       </header>
-
       <div class="face-row">
         <div class="face-preview" id="facePreview"></div>
         <div class="face-actions">
-          <label class="btn">
+          <label class="pill dark">
             <input type="file" id="photoInput" accept="image/*" hidden />
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
-            Foto de tu cara
+            <span id="photoLabel">Subir selfie</span>
           </label>
+          <p class="status" id="faceStatus"></p>
           <button type="button" class="link" id="removePhoto" hidden>Quitar foto</button>
           <div class="face-adjust" id="faceAdjust" hidden>
-            <label for="pZoom">Zoom</label><input type="range" id="pZoom" min="0.6" max="3" step="0.02" />
+            <label for="pZoom">Tamaño</label><input type="range" id="pZoom" min="0.7" max="1.5" step="0.01" />
             <label for="pX">Horizontal</label><input type="range" id="pX" min="-1" max="1" step="0.01" />
             <label for="pY">Vertical</label><input type="range" id="pY" min="-1" max="1" step="0.01" />
           </div>
         </div>
       </div>
-
-      <fieldset class="seg" id="genderSeg">
-        <legend>Ropa de</legend>
-        <button type="button" data-v="men">Hombre</button>
-        <button type="button" data-v="women">Mujer</button>
+      <fieldset class="seg" id="genderSeg"><legend>Ropa de</legend>
+        <button type="button" data-v="men">Hombre</button><button type="button" data-v="women">Mujer</button>
       </fieldset>
-
       <div class="two">
         <label class="num"><span>Altura</span><input id="height" type="number" inputmode="numeric" min="130" max="215" /><i>cm</i></label>
         <label class="num"><span>Peso</span><input id="weight" type="number" inputmode="decimal" min="35" max="200" step="0.5" /><i>kg</i></label>
       </div>
-
-      <fieldset class="seg" id="prefSeg">
-        <legend>Te gusta la ropa</legend>
-        <button type="button" data-v="fitted">Ceñida</button>
-        <button type="button" data-v="normal">Normal</button>
-        <button type="button" data-v="loose">Holgada</button>
+      <fieldset class="seg" id="prefSeg"><legend>Te gusta la ropa</legend>
+        <button type="button" data-v="fitted">Ceñida</button><button type="button" data-v="normal">Normal</button><button type="button" data-v="loose">Holgada</button>
       </fieldset>
-
-      <div class="skin">
-        <span class="lbl">Tono de piel <small id="skinAuto"></small></span>
-        <div class="swatches" id="skinSwatches"></div>
-      </div>
-
+      <div class="skin"><span class="lbl">Tono de piel <small id="skinAuto"></small></span><div class="swatches" id="skinSwatches"></div></div>
       <details class="measures">
         <summary>Mis medidas <small id="measureSummary"></small></summary>
         <div class="three">
@@ -127,8 +187,7 @@
         </div>
         <p class="hint">Opcional. Si las dejas vacías, las calculamos con tu altura y peso.</p>
       </details>
-
-      <button class="btn primary wide" value="ok" type="submit">Listo, a probar ropa</button>
+      <button class="pill dark wide" value="ok" type="submit">Listo, a probar ropa</button>
     </form>
   </dialog>
 
@@ -137,7 +196,7 @@
     <form method="dialog" class="sheet-body" id="addForm">
       <header class="sheet-head">
         <h2 id="addTitle">Agregar una prenda</h2>
-        <p>De cualquier tienda: Zara, H&amp;M, Mattelsa, Uniqlo… Usa la foto de la prenda sola (la de la galería del producto, sin modelo).</p>
+        <p>De cualquier tienda: Zara, H&amp;M, Mattelsa, Remanence, Uniqlo… Usa la foto de la prenda sola (la de la galería del producto, sin modelo).</p>
       </header>
       <label class="drop" id="drop" tabindex="0">
         <input type="file" id="garmentInput" accept="image/*" multiple hidden />
@@ -146,11 +205,9 @@
         <small>En la tienda: clic derecho sobre la foto → “Copiar imagen”, y pégala aquí.</small>
       </label>
       <div class="processing" id="processing" hidden></div>
-      <label class="num full"><span>Nombre (opcional)</span><input id="garmentName" placeholder="Ej: Camiseta oversize negra" /></label>
-      <p class="hint ext">¿Quieres hacerlo con un clic? Instala la <a href="https://github.com/julicam10/MeQueda/tree/main/extension" target="_blank" rel="noopener">extensión de MeQueda</a>: agrega un botón “Probar en MeQueda” en la página de cada producto y toma la tabla de tallas sola.</p>
-      <div class="row-end">
-        <button class="btn ghost" value="cancel" type="button" id="addCancel">Cerrar</button>
-      </div>
+      <label class="num full"><span>Nombre (opcional)</span><input id="garmentName" placeholder="Ej: Chaqueta State negra" /></label>
+      <p class="hint">¿Con un clic? Instala la <a href="https://github.com/julicam10/MeQueda/tree/main/extension" target="_blank" rel="noopener">extensión de MeQueda</a>: agrega “Probar en MeQueda” en la página de cada producto y toma la tabla de tallas sola.</p>
+      <div class="row-end"><button class="pill light" value="cancel" type="button" data-close>Cerrar</button></div>
     </form>
   </dialog>
 
@@ -159,6 +216,7 @@
   <script src="js/sizing.js"></script>
   <script src="js/garment.js"></script>
   <script src="js/avatar.js"></script>
+  <script src="js/face.js"></script>
   <script src="js/store.js"></script>
   <script src="js/app.js"></script>
 </body>

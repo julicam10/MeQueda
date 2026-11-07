@@ -250,8 +250,7 @@
       let mx = 0, my = 0;
       for (const p of pts) { mx += p[0]; my += p[1]; }
       mx /= pts.length; my /= pts.length;
-      const hole = { x: (piv.x + cx + side * half) / 2, y: (piv.y + armpitY) / 2 };
-      let ux = mx - hole.x, uy = my - hole.y;
+      let ux = mx - piv.x, uy = my - piv.y;
       const ul = Math.hypot(ux, uy) || 1; ux /= ul; uy /= ul;
       let maxT = 0;
       for (const p of pts) { const t = (p[0] - piv.x) * ux + (p[1] - piv.y) * uy; if (t > maxT) maxT = t; }

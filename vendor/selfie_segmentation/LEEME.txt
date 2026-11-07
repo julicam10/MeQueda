@@ -1,0 +1,2 @@
+Copia de @mediapipe/selfie_segmentation 0.1.1675465747 (Apache-2.0, Google).
+Se usa para recortar tu cara de la foto, 100% en tu navegador.

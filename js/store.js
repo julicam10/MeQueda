@@ -2,7 +2,7 @@
 (function () {
   const MQ = (window.MQ = window.MQ || {});
   const PKEY = 'mequeda:profile:v2';
-  const DB = 'mequeda', ST = 'garments';
+  const DB = 'mequeda-v3', ST = 'garments';
 
   MQ.loadProfile = function () {
     try { const s = localStorage.getItem(PKEY); return s ? JSON.parse(s) : null; } catch (e) { return null; }
