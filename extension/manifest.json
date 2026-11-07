@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "MeQueda — ¿Te queda?",
+  "version": "0.1.0",
+  "description": "Pruébate en tu avatar la prenda que estás viendo en cualquier tienda online, talla por talla.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_title": "Probar esta prenda en MeQueda",
+    "default_icon": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+  },
+  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.uniqlo.com/*", "*://*.zara.com/*", "*://*.hm.com/*", "*://*.mattelsa.net/*", "*://*.mattelsa.com/*",
+        "*://*.remanence.co/*", "*://*.remanence.com.co/*", "*://*.pullandbear.com/*", "*://*.bershka.com/*",
+        "*://*.stradivarius.com/*", "*://*.massimodutti.com/*", "*://*.gap.com/*", "*://*.oldnavy.com/*",
+        "*://*.koaj.co/*", "*://*.arturocalle.com/*", "*://*.studiof.com.co/*", "*://*.shein.com/*",
+        "*://*.asos.com/*", "*://*.nike.com/*", "*://*.adidas.com.co/*", "*://*.adidas.com/*", "http://localhost/*"
+      ],
+      "js": ["extract.js", "button.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://julicam10.github.io/MeQueda/*", "http://localhost/*", "http://127.0.0.1/*"],
+      "js": ["bridge.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
